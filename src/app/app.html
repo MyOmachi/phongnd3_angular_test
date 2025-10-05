@@ -2,10 +2,13 @@
   <div class="container mx-auto max-w-6xl px-4 flex items-center">
     <span class="font-semibold">DummyShop</span>
     <span class="flex-1"></span>
+
+    @if( isLoggedIn$ |async ) {
     <nav class="flex items-center gap-4">
       <a mat-button routerLink="/products">Products</a>
       <a mat-button routerLink="/login">Login</a>
     </nav>
+    }
   </div>
 </mat-toolbar>
 

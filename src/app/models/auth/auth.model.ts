@@ -1,7 +1,7 @@
 export interface User {
-  id: number;
-  username: string;
-  email: string;
+  id: number | null;
+  username: string | null;
+  email: string | null;
 }
 
 export interface LoginResponse extends User {
