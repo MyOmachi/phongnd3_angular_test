@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -21,11 +21,12 @@ import { selectCurrentUser, selectIsLoggedIn } from '../../store/user/user.selec
     MatIconModule,
   ],
   templateUrl: './login.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent {
   private fb = inject(FormBuilder);
   private store = inject(Store);
-  private _hide = signal(true);
+  private _hidePassword = signal(true);
 
   isLoggedIn$ = this.store.select(selectIsLoggedIn);
   user$ = this.store.select(selectCurrentUser);
@@ -35,8 +36,8 @@ export class LoginComponent {
     password: ['', Validators.required],
   });
 
-  hide = () => this._hide();
-  toggle = () => this._hide.set(!this._hide());
+  hidePassword = () => this._hidePassword();
+  togglePasswordVisibility = () => this._hidePassword.set(!this._hidePassword());
 
   submit() {
     if (this.form.invalid) return;

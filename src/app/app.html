@@ -1,10 +1,14 @@
 <mat-toolbar color="primary" class="sticky top-0 z-10">
-  <span class="font-semibold">DummyShop</span>
-  <span class="flex-1"></span>
-  <a mat-button routerLink="/products">Products</a>
-  <a mat-button routerLink="/login">Login</a>
+  <div class="container mx-auto max-w-6xl px-4 flex items-center">
+    <span class="font-semibold">DummyShop</span>
+    <span class="flex-1"></span>
+    <nav class="flex items-center gap-4">
+      <a mat-button routerLink="/products">Products</a>
+      <a mat-button routerLink="/login">Login</a>
+    </nav>
+  </div>
 </mat-toolbar>
 
-<main class="p-4">
+<main class="container mx-auto max-w-6xl px-4 py-4">
   <router-outlet></router-outlet>
 </main>
