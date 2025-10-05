@@ -1,13 +1,22 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatToolbar } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
 import { Store } from '@ngrx/store';
 import { selectIsLoggedIn } from './store/user/user.selectors';
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, MatToolbar, AsyncPipe],
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    RouterLink,
+    RouterLinkActive,
+    MatToolbar,
+    MatButtonModule,
+    AsyncPipe,
+  ],
   templateUrl: './app.html',
   styleUrl: './app.scss',
   standalone: true,

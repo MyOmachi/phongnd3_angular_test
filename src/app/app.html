@@ -5,8 +5,9 @@
 
     @if( isLoggedIn$ |async ) {
     <nav class="flex items-center gap-4">
-      <a mat-button routerLink="/products">Products</a>
-      <a mat-button routerLink="/login">Login</a>
+      <a mat-button routerLink="/products" routerLinkActive="active-link">Products</a>
+      <a mat-button routerLink="/favourites" routerLinkActive="active-link">Favourites</a>
+      <!-- <a mat-button routerLink="/logout">Logout</a> -->
     </nav>
     }
   </div>
