@@ -9,7 +9,7 @@ export class ProductService {
   private http = inject(HttpClient);
   private url = `${environment.apiBaseUrl}/products`;
 
-  getAllProduct() {
+  getAllProducts() {
     return this.http.get<ProductsResponse>(this.url).pipe(map((r) => r.products));
   }
 }

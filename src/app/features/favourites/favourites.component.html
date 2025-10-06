@@ -1,1 +1,6 @@
-<p>favourites.component works!</p>
+<app-products-list
+  [products]="(visibleProducts$ | async) ?? []"
+  [(favIds)]="favIds"
+></app-products-list>
+
+<p class="text-xs text-gray-500 mt-3">Changes will be applied when leaving this page.</p>

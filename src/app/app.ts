@@ -25,8 +25,4 @@ import { AsyncPipe, CommonModule } from '@angular/common';
 export class App {
   private store = inject(Store);
   isLoggedIn$ = this.store.select(selectIsLoggedIn);
-
-  ngOnInit() {
-    this.isLoggedIn$.subscribe((u) => console.log('isLoggedIn$', u));
-  }
 }
