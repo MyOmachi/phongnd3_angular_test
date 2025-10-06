@@ -1,10 +1,16 @@
 import { TestBed } from '@angular/core/testing';
+import { provideMockStore } from '@ngrx/store/testing';
 import { App } from './app';
 
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
+      providers: [
+        provideMockStore({
+          initialState: { user: {}, favouriteProductIds: { favouriteProductIds: [] } },
+        }),
+      ],
     }).compileComponents();
   });
 
@@ -18,6 +24,7 @@ describe('App', () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, phongnd3_angular_test');
+    // the app template contains the app title in the toolbar
+    expect(compiled.querySelector('.font-semibold')?.textContent).toContain('DummyShop');
   });
 });
