@@ -1,11 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  OnDestroy,
-  OnInit,
-  inject,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { CommonModule, AsyncPipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -22,12 +15,12 @@ import { ProductsListComponent } from '../shared/products-list/products-list.com
   templateUrl: './products.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ProductsComponent implements OnInit, OnDestroy {
+export class ProductsComponent {
   private store = inject(Store);
   private productService = inject(ProductService);
+  favIds = signal<number[]>([]);
 
   products$ = this.productService.getAllProducts();
-  favIds = signal<number[]>([]);
 
   ngOnInit() {
     this.store.select(selectFavouriteProductIds).subscribe((ids) => {
