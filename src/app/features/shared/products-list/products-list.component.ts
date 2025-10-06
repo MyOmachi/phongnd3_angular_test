@@ -14,6 +14,7 @@ import { Product } from '../../../models/product.model';
 })
 export class ProductsListComponent {
   products = input.required<Product[]>();
+
   favIds = model<number[]>([]);
 
   isFav = (id: number) => this.favIds().includes(id);

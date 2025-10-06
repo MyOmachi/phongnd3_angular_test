@@ -1,59 +1,77 @@
-# Phongnd3AngularTest
+# Phongnd3 Angular Test
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.4.
+This is a sample Angular application (generated with Angular CLI v20.x) used to demonstrate a small app architecture and tooling choices.
 
-## Development server
+Key technologies used
 
-To start a local development server, run:
+- Styling: Tailwind CSS + PostCSS and Angular Material for component UI
+- State management: NgRx (@ngrx/store, @ngrx/effects, @ngrx/store-devtools)
+- End-to-end testing: Cypress
+- Unit testing: Karma + Jasmine (default Angular test stack)
 
-```bash
-ng serve
+Repository layout (important folders)
+
+- `src/app` - application source
+- `src/app/features` - feature modules and components
+- `src/app/services` - services (API, auth, products)
+- `src/app/store` - NgRx store, actions, reducers, effects, selectors
+- `cypress` - E2E tests, fixtures and configuration
+
+Getting started
+
+1. Install dependencies
+
+```powershell
+npm install
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+2. Start the dev server
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```powershell
+npm start
+# or: ng serve
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Open http://localhost:4200 in your browser.
 
-```bash
-ng generate --help
+Build for production
+
+```powershell
+npm run build
+# or: ng build --configuration production
 ```
 
-## Building
+Unit tests (Karma + Jasmine)
 
-To build the project run:
+This project uses the default Angular unit test setup with Karma as the test runner and Jasmine for the test framework. Run unit tests with:
 
-```bash
-ng build
+```powershell
+npm test
+# or: ng test
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+End-to-end tests (Cypress)
 
-## Running unit tests
+E2E tests are implemented with Cypress. You can open the Cypress UI or run tests headless:
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
+```powershell
+npm run cypress:open
+npm run cypress:run
 ```
 
-## Running end-to-end tests
+Styling
 
-For end-to-end (e2e) testing, run:
+- Tailwind CSS is installed and configured via PostCSS. You can use Tailwind utility classes throughout the Angular templates and component styles.
+- Angular Material is included for ready-made, accessible UI components. Look for Material module imports in the app module(s).
 
-```bash
-ng e2e
-```
+State management
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+NgRx is used for application state (store, effects, and devtools are included). The `src/app/store` folder contains actions, reducers, effects, and selectors. Use `Store` and `Effects` in components and services to interact with app state.
 
-## Additional Resources
+Most complex part: NgRx-based authentication flow
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+One of the more complex and central areas of this project is the NgRx-based authentication flow — the combined system of actions, reducer, effects, the `AuthService`, the `AuthInterceptor`, and the routing `authGuard`. Together these pieces implement login HTTP calls, token storage and lifecycle, route protection, and global 401 handling. This flow is intentionally split across layers (UI dispatches actions, effects do side effects and navigation, reducers store user state, the interceptor appends tokens and redirects on 401s) which makes it robust and testable but requires careful coordination and good RxJS discipline.
+
+Note on Signal Store
+
+Signal Store (Angular's newer reactive store built on signals) is an interesting alternative to NgRx for some use cases. It's not yet used in this repo because I'm not familiar with it yet — something I plan to explore soon (maybe after today). If Signal Store fits the app's patterns, some parts of the state handling could be simplified in the future.
