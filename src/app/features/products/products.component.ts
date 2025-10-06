@@ -19,16 +19,24 @@ export class ProductsComponent {
   private store = inject(Store);
   private productService = inject(ProductService);
   favIds = signal<number[]>([]);
+  private lastStoredFavIds: number[] = [];
 
   products$ = this.productService.getAllProducts();
 
   ngOnInit() {
     this.store.select(selectFavouriteProductIds).subscribe((ids) => {
+      this.lastStoredFavIds = [...ids];
       this.favIds.set([...ids]);
     });
   }
 
   ngOnDestroy() {
-    this.store.dispatch(updateFavourite({ favouriteProductIds: this.favIds() }));
+    const currentIds = this.favIds();
+    const storedIds = this.lastStoredFavIds || [];
+    const isEqual =
+      currentIds.length === storedIds.length && currentIds.every((v, i) => v === storedIds[i]);
+    if (!isEqual) {
+      this.store.dispatch(updateFavourite({ favouriteProductIds: currentIds }));
+    }
   }
 }
