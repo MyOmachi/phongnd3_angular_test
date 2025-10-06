@@ -3,15 +3,15 @@
     <h2 class="text-2xl font-bold mb-4 text-center">Login</h2>
 
     @if (isLoggedIn$ | async ) {
-    <div class="mb-4 text-center">
-      @if (user$ | async ) {
-      <div class="text-green-600">
-        Signed in as <span class="font-semibold">{{ (user$ | async)?.username }}</span>
+      <div class="mb-4 text-center">
+        @if (user$ | async ) {
+          <div class="text-green-600">
+            Signed in as <span class="font-semibold">{{ (user$ | async)?.username }}</span>
+          </div>
+        }
       </div>
-      }
-    </div>
     } @else {
-    <ng-container *ngTemplateOutlet="loginForm"></ng-container>
+      <ng-container *ngTemplateOutlet="loginForm"></ng-container>
     }
 
     <ng-template #loginForm>

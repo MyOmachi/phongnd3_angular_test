@@ -1,0 +1,3 @@
+# Ignore specific component with custom template directives that Prettier's HTML/Angular parser misformats
+src/app/features/shared/products-list/products-list.component.html
+src/app/auth/login/login.component.html
