@@ -20,19 +20,8 @@ export class AuthService {
       .pipe(tap((response) => this.persistSession(response)));
   }
 
-  refreshAccessToken(): Observable<LoginResponse> {
-    const refreshToken = this.getRefreshToken();
-    return this.http
-      .post<LoginResponse>(`${this.baseUrl}/refresh`, { refreshToken })
-      .pipe(tap((response) => this.persistSession(response)));
-  }
-
   getAccessToken(): string | null {
     return sessionStorage.getItem('accessToken');
-  }
-
-  getRefreshToken(): string | null {
-    return sessionStorage.getItem('refreshToken');
   }
 
   clearAccessToken(): void {
@@ -41,6 +30,5 @@ export class AuthService {
 
   private persistSession(res: LoginResponse) {
     sessionStorage.setItem('accessToken', res.accessToken);
-    sessionStorage.setItem('refreshToken', res.refreshToken);
   }
 }
