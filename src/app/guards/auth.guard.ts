@@ -6,7 +6,5 @@ import { map, catchError, of } from 'rxjs';
 export const authGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
   const router = inject(Router);
-  return authService.getAccessToken()?.length
-    ? of(true)
-    : router.navigate(['/login']).then(() => false);
+  return !!authService.getAccessToken() || router.parseUrl('/login');
 };

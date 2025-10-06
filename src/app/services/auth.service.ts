@@ -14,21 +14,23 @@ export class AuthService {
 
   private baseUrl = `${environment.apiBaseUrl}/auth`;
 
+  private _accessToken: string | null = null;
+
   login(username: string, password: string): Observable<LoginResponse> {
     return this.http
       .post<LoginResponse>(`${this.baseUrl}/login`, { username, password })
-      .pipe(tap((response) => this.persistSession(response)));
+      .pipe(tap((response) => this.setAccessToken(response.accessToken)));
   }
 
   getAccessToken(): string | null {
-    return sessionStorage.getItem('accessToken');
+    return this._accessToken;
+  }
+
+  setAccessToken(token: string | null): void {
+    this._accessToken = token;
   }
 
   clearAccessToken(): void {
-    sessionStorage.removeItem('accessToken');
-  }
-
-  private persistSession(res: LoginResponse) {
-    sessionStorage.setItem('accessToken', res.accessToken);
+    this._accessToken = null;
   }
 }

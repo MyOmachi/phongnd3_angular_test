@@ -5,4 +5,4 @@ export const selectUserState = createFeatureSelector<UserState>('user');
 
 export const selectCurrentUser = createSelector(selectUserState, (state: UserState) => state.user);
 
-export const selectIsLoggedIn = createSelector(selectCurrentUser, (user) => !!(user && user.id));
+export const selectIsLoggedIn = createSelector(selectCurrentUser, (user) => !!user);

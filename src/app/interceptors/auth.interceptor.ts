@@ -1,6 +1,6 @@
-import { inject, Injectable } from '@angular/core';
+import { inject } from '@angular/core';
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
-import { Observable, ReplaySubject, catchError, filter, switchMap, take, throwError } from 'rxjs';
+import { catchError, throwError } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { environment } from '../../enviroments/environment';
 import { Router } from '@angular/router';
