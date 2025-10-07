@@ -1,6 +1,7 @@
 import { createReducer, on } from '@ngrx/store';
 import { Product } from '../../models/product.model';
 import { updateFavouriteProducts } from './favourite.actions';
+import * as UserActions from '../user/user.actions';
 
 export interface FavouriteProducts {
   favouriteProducts: Product[];
@@ -15,5 +16,6 @@ export const favouriteProductsReducer = createReducer(
   on(updateFavouriteProducts, (state, { products }) => ({
     ...state,
     favouriteProducts: products ?? [],
-  }))
+  })),
+  on(UserActions.logout, () => initialFavouriteProducts)
 );

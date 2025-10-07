@@ -90,6 +90,7 @@ describe('User Store', () => {
         'setAccessToken',
         'clearAccessToken',
         'getAccessToken',
+        'setRefreshToken',
       ]);
       router = jasmine.createSpyObj<Router>('Router', ['navigate']);
 

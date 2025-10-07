@@ -17,7 +17,10 @@ export class UserEffects {
       ofType(UserActions.login),
       exhaustMap(({ username, password }) =>
         this.authService.login(username, password).pipe(
-          tap((res) => this.authService.setAccessToken(res.accessToken ?? null)),
+          tap((res) => {
+            this.authService.setAccessToken(res.accessToken);
+            this.authService.setRefreshToken(res.refreshToken);
+          }),
           map((user: User) => {
             const { id, username, email } = user;
             return UserActions.loginSuccess({ user: { id, username, email } });
@@ -35,6 +38,27 @@ export class UserEffects {
         switchMap(() => {
           this.router.navigate(['/products']);
           return of();
+        })
+      ),
+    { dispatch: false }
+  );
+
+  loginFailure$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(UserActions.loginFailure),
+        tap(() => this.authService.clearAllTokens())
+      ),
+    { dispatch: false }
+  );
+
+  logout$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(UserActions.logout),
+        tap(() => {
+          this.authService.clearAllTokens();
+          this.router.navigate(['/login']);
         })
       ),
     { dispatch: false }

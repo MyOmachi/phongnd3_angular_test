@@ -7,6 +7,8 @@
     <nav class="flex items-center gap-4">
       <a mat-button routerLink="/products" routerLinkActive="active-link">Products</a>
       <a mat-button routerLink="/favourites" routerLinkActive="active-link">Favourites</a>
+      <button mat-stroked-button (click)="checkToken()">Check token</button>
+      <button mat-stroked-button (click)="logout()" aria-label="Logout">Logout</button>
     </nav>
     }
   </div>

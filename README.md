@@ -30,3 +30,22 @@ I created small app that demonstrates an **infinite-scroll product list**, simpl
 
 - When a **not logged-in** user navigates to an **invalid route**, the app **redirects to `/login`**.
 - When a **logged-in** user navigates to an **invalid route**, the app **redirects to `/products`** (the main product list).
+
+## 6) “Check token” button (refresh flow demo)
+
+- **What it is:** A small dev/testing button that appears **only when logged in**.
+- **Where:** Top toolbar, next to **Logout**.
+- **What it does:** Sends a request to the protected endpoint **`/auth/me`** using the current **Bearer access token**.
+- **Why it matters:** Most of the app’s calls (e.g., `/products`) are public and won’t 401 when the access token expires. This button forces a call to a protected API so you can observe the **auto-refresh** behavior.
+
+**Expected behavior**
+
+1. If the access token is **still valid** → `/auth/me` returns **200** (no refresh needed).
+2. If the access token is **expired** → the request returns **401**, and the **AuthInterceptor** will:
+   - Call **`/auth/refresh`** with the stored refresh token.
+   - Save the new tokens.
+   - **Retry** the original `/auth/me` call → should now succeed (200).
+
+> Notes:
+>
+> - This button doesn’t change app data; it simply “pings” a protected endpoint to exercise the **401 → refresh → retry** flow.

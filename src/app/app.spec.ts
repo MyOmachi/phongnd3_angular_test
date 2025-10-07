@@ -1,12 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { provideMockStore } from '@ngrx/store/testing';
 import { App } from './app';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
       providers: [
+        provideHttpClient(withInterceptorsFromDi()),
         provideMockStore({
           initialState: { user: {}, favouriteProductIds: { favouriteProductIds: [] } },
         }),
