@@ -46,7 +46,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   ngOnInit() {
-    // Sync favourites từ store -> favouriteIds (để 2-way binding với ProductsList)
     this.store
       .select(selectFavouriteProducts)
       .pipe(takeUntil(this.destroy$))
@@ -56,12 +55,10 @@ export class ProductsComponent implements OnInit, OnDestroy {
         this.favouriteIds.set(ids);
       });
 
-    // Tải trang đầu
     this.loadMore();
   }
 
   loadMore() {
-    // Back-pressure + idempotent guard
     if (this.loading() || this.done()) return;
 
     this.loading.set(true);
@@ -72,9 +69,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (batch) => {
-          // Hết dữ liệu khi mảng rỗng hoặc < pageSize
           if (!batch || batch.length < this.pageSize) this.done.set(true);
-          // GỘP đúng cú pháp (đã sửa)
           this.visibleProducts.update((curr) => [...curr, ...(batch ?? [])]);
         },
         error: () => this.done.set(true),
@@ -83,7 +78,6 @@ export class ProductsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // Nếu favouriteIds thay đổi so với store -> dispatch cập nhật
     const currentIds = this.favouriteIds();
     const storedIds = this.lastStoredFavouriteIds ?? [];
     const same =
