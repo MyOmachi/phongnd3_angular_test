@@ -1,1 +1,16 @@
-<app-products-list [products]="(products$ | async) ?? []" [(favIds)]="favIds"></app-products-list>
+<app-products-list [products]="items()" [(favIds)]="favIds"></app-products-list>
+
+@if (loading() && !done()) {
+<div class="py-6 text-center text-sm text-gray-600">Loading more...</div>
+}
+
+<div
+  class="h-1 w-full"
+  appInfiniteScroll
+  [disabled]="loading() || done()"
+  (reached)="loadMore()"
+></div>
+
+@if (done()) {
+<div class="text-center text-sm text-gray-500 py-4">You’ve reached the end.</div>
+}

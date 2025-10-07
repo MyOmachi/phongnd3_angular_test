@@ -1,0 +1,73 @@
+@defer (when products(); prefetch on idle; on viewport) { @let list = products();
+<!-- Product grid -->
+<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" role="list">
+  @for (p of list; track p.id) {
+  <article
+    role="listitem"
+    class="border rounded-2xl p-4 bg-white shadow-sm hover:shadow-md transition-shadow"
+  >
+    <div class="relative mb-3">
+      <img
+        [src]="p.thumbnail"
+        [alt]="p.title"
+        class="w-full h-44 object-cover rounded-xl"
+        loading="lazy"
+        decoding="async"
+      />
+
+      <!-- Favourite toggle -->
+      <button
+        mat-icon-button
+        class="absolute top-2 right-2 bg-white/90 rounded-full"
+        (click)="toggleFavourite(p.id)"
+        [attr.aria-pressed]="isFav(p.id)"
+        [attr.aria-label]="isFav(p.id) ? 'Remove from favourites' : 'Add to favourites'"
+      >
+        <mat-icon [class.text-red-600]="isFav(p.id)">
+          {{ isFav(p.id) ? 'favorite' : 'favorite_border' }}
+        </mat-icon>
+      </button>
+    </div>
+
+    <h3 class="font-semibold leading-snug mb-1 line-clamp-2">{{ p.title }}</h3>
+    <p class="text-sm text-gray-600 mb-3 line-clamp-2">{{ p.description }}</p>
+
+    <div class="flex items-center justify-between">
+      <span class="font-semibold text-base">${{ p.price }}</span>
+      <button mat-stroked-button color="primary">View</button>
+    </div>
+  </article>
+  }
+</div>
+} @placeholder (minimum 500ms) {
+<!-- Skeleton loader -->
+<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-hidden="true">
+  @for (_ of [0,1,2,3,4,5]; track _) {
+  <div class="border rounded-2xl p-4 bg-white shadow-sm">
+    <div class="w-full h-44 rounded-xl mb-3 bg-gray-200 animate-pulse"></div>
+    <div class="h-4 w-3/4 bg-gray-200 rounded mb-2 animate-pulse"></div>
+    <div class="h-3 w-full bg-gray-200 rounded mb-2 animate-pulse"></div>
+    <div class="h-3 w-5/6 bg-gray-200 rounded mb-4 animate-pulse"></div>
+    <div class="h-9 w-24 bg-gray-200 rounded animate-pulse"></div>
+  </div>
+  }
+</div>
+} @loading (minimum 500ms) {
+<!-- Loading state (shorter skeleton) -->
+<div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-hidden="true">
+  @for (_ of [0,1,2]; track _) {
+  <div class="border rounded-2xl p-4 bg-white shadow-sm">
+    <div class="w-full h-44 rounded-xl mb-3 bg-gray-200 animate-pulse"></div>
+    <div class="h-4 w-2/3 bg-gray-200 rounded mb-2 animate-pulse"></div>
+    <div class="h-3 w-5/6 bg-gray-200 rounded mb-4 animate-pulse"></div>
+    <div class="h-9 w-20 bg-gray-200 rounded animate-pulse"></div>
+  </div>
+  }
+</div>
+} @error {
+<!-- Error state -->
+<section class="py-10 text-center" aria-live="assertive">
+  <h2 class="text-lg font-semibold mb-2">Something went wrong</h2>
+  <p class="text-sm text-gray-600 mb-4">Please try again later.</p>
+</section>
+}

@@ -1,5 +1,13 @@
-.active-link {
-  background-color: lightblue;
-  color: #0a2e6b;
-  border-radius: 0.375rem;
+mat-toolbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1100;
+
+  .active-link {
+    background-color: lightblue;
+    color: #0a2e6b;
+    border-radius: 0.375rem;
+  }
 }

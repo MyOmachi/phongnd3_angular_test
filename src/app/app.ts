@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  inject,
+  signal,
+  ViewChild,
+} from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { MatToolbar } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -23,6 +30,16 @@ import { AsyncPipe, CommonModule } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class App {
+  @ViewChild('toolbar', { static: true }) toolbar!: ElementRef<HTMLElement>;
+  toolbarHeight = signal(64);
+
   private store = inject(Store);
   isLoggedIn$ = this.store.select(selectIsLoggedIn);
+
+  ngAfterViewInit() {
+    const height = this.toolbar.nativeElement?.offsetHeight;
+    if (height) {
+      this.toolbarHeight.set(height);
+    }
+  }
 }
