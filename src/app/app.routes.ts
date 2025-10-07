@@ -1,5 +1,7 @@
-import { Routes } from '@angular/router';
+import { CanMatchFn, Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
+import { unknownRedirectGuard } from './guards/unknown-redirect.guard';
+import { NotFoundRedirectComponent } from './features/not-found-redirect/not-found-redirect.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'products', pathMatch: 'full' },
@@ -19,5 +21,5 @@ export const routes: Routes = [
       import('./features/favourites/favourites.component').then((m) => m.FavouritesComponent),
     canActivate: [authGuard],
   },
-  { path: '**', redirectTo: 'products' },
+  { path: '**', canActivate: [unknownRedirectGuard], component: NotFoundRedirectComponent },
 ];

@@ -1,77 +1,37 @@
-# Phongnd3 Angular Test
+# Angular v20 – Products & Favourites (Project Overview)
 
-This is a sample Angular application (generated with Angular CLI v20.x) used to demonstrate a small app architecture and tooling choices.
+## 1) Goal
+A small app that demonstrates an **infinite‑scroll product list**, simple **favourites** management, and **login**, with a clean, maintainable **unit test** suite.
 
-Key technologies used
+## 2) What I used
+- **Angular v20** with **standalone components** and **signals** for simple local state.
+- **NgRx** for long‑lived app state (user, favourites).
+- **Angular Material** for basic UI.
+- **Deferrable views (`@defer`)** to postpone rendering heavy parts for a snappier feel.
+- A single **infinite scroll directive** to load the next page when the list nears the end.
 
-- Styling: Tailwind CSS + PostCSS and Angular Material for component UI
-- State management: NgRx (@ngrx/store, @ngrx/effects, @ngrx/store-devtools)
-- End-to-end testing: Cypress
-- Unit testing: Karma + Jasmine (default Angular test stack)
+## 3) What I built
+- **Products**: server‑side pagination + infinite scroll to load more items.
+- **Favourites**: mark/unmark items and keep them in sync with the store.
+- **Auth**: a simple login flow that navigates to the products page on success.
+- **Tests**: unit tests for components (Products, ProductsList, Favourites), store (actions/reducer/selectors), and effects (login).
 
-Repository layout (important folders)
+## 4) How I tested (idea‑focused)
+- **Behavior‑first**: verify what users experience (first page loads, load‑more works, “end of list” state, post‑login redirect, etc.).
+- **Minimal mocking**: stub only what’s needed in services and the store for fast, stable tests.
+- **Controlled defers**: explicitly complete `@defer` blocks during tests to avoid timing and flakiness issues.
+- **No race conditions**: keep **one** infinite‑scroll mechanism (the directive) and add back‑pressure so we don’t call the API while a request is in flight.
 
-- `src/app` - application source
-- `src/app/features` - feature modules and components
-- `src/app/services` - services (API, auth, products)
-- `src/app/store` - NgRx store, actions, reducers, effects, selectors
-- `cypress` - E2E tests, fixtures and configuration
+## 5) The trickiest part & the fix
+**Combining `@defer` with infinite scrolling.** Deferred content can be rendered later, which easily breaks code that touches the DOM too early.
+- **Solution**: pick a **single** mechanism for infinite scroll (the directive), and **manually complete** `@defer` in tests. This keeps the code lean and the tests reliable.
 
-Getting started
+## 6) App routes
+- When a **logged‑in** user navigates to an **invalid route**, the app **redirects to `/products`** (the main product list).
 
-1. Install dependencies
-
-```powershell
+## 7) Running tests & coverage
+```bash
 npm install
+ng test --no-watch --code-coverage
+# Open coverage/<project>/index.html to view the report
 ```
-
-2. Start the dev server
-
-```powershell
-npm start
-# or: ng serve
-```
-
-Open http://localhost:4200 in your browser.
-
-Build for production
-
-```powershell
-npm run build
-# or: ng build --configuration production
-```
-
-Unit tests (Karma + Jasmine)
-
-This project uses the default Angular unit test setup with Karma as the test runner and Jasmine for the test framework. Run unit tests with:
-
-```powershell
-npm test
-# or: ng test
-```
-
-End-to-end tests (Cypress)
-
-E2E tests are implemented with Cypress. You can open the Cypress UI or run tests headless:
-
-```powershell
-npm run cypress:open
-npm run cypress:run
-```
-
-Styling
-
-- Tailwind CSS is installed and configured via PostCSS. You can use Tailwind utility classes throughout the Angular templates and component styles.
-- Angular Material is included for ready-made, accessible UI components. Look for Material module imports in the app module(s).
-
-State management
-
-NgRx is used for application state (store, effects, and devtools are included). The `src/app/store` folder contains actions, reducers, effects, and selectors. Use `Store` and `Effects` in components and services to interact with app state.
-
-Most complex part: NgRx-based authentication flow
-
-One of the more complex and central areas of this project is the NgRx-based authentication flow — the combined system of actions, reducer, effects, the `AuthService`, the `AuthInterceptor`, and the routing `authGuard`. Together these pieces implement login HTTP calls, token storage and lifecycle, route protection, and global 401 handling. This flow is intentionally split across layers (UI dispatches actions, effects do side effects and navigation, reducers store user state, the interceptor appends tokens and redirects on 401s) which makes it robust and testable but requires careful coordination and good RxJS discipline.
-
-Note on Signal Store
-
-Signal Store (Angular's newer reactive store built on signals) is an interesting alternative to NgRx for some use cases. It's not yet used in this repo because I'm not familiar with it yet — something I plan to explore soon (maybe after today). If Signal Store fits the app's patterns, some parts of the state handling could be simplified in the future.

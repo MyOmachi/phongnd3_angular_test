@@ -5,11 +5,13 @@
 <div class="py-6 text-center text-sm text-gray-600">Loading more...</div>
 }
 
+<!-- Chỉ dùng directive infinite scroll -->
 <div
   class="h-1 w-full"
   appInfiniteScroll
   [disabled]="loading() || done()"
   (reached)="loadMore()"
+  aria-hidden="true"
 ></div>
 
 @if (done()) {

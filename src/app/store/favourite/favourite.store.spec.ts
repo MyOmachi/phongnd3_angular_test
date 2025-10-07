@@ -4,69 +4,70 @@ import {
   initialFavouriteProducts,
   FavouriteProducts,
 } from './favourite.reducer';
-import {
-  selectFavouritesProductsFeature,
-  selectFavouriteProducts,
-  selectFavouriteIds,
-} from './favourite.selectors';
+import * as FavouriteSelectors from './favourite.selectors';
 import { Product } from '../../models/product.model';
 
-describe('FavouriteProducts store (actions / reducer / selectors)', () => {
-  const mockProducts: Product[] = [
-    { id: 1, title: 'Laptop', price: 1200, description: 'Powerful laptop', thumbnail: '' },
-    {
-      id: 2,
-      title: 'Phone',
-      price: 800,
-      description: 'Smartphone with OLED screen',
-      thumbnail: '',
-    },
-  ];
+function P(id: number): Product {
+  return {
+    id,
+    title: 'P' + id,
+    description: 'D' + id,
+    price: id * 10,
+    thumbnail: 't' + id + '.jpg',
+  } as Product;
+}
 
-  it('should create the updateFavouriteProducts action with payload', () => {
-    const action = updateFavouriteProducts({ products: mockProducts });
-    expect(action.type).toBe('[Favourite] Update Products');
-    expect(action.products).toEqual(mockProducts);
+describe('Favourite Store', () => {
+  describe('Actions', () => {
+    it('updateFavouriteProducts should create action with products payload', () => {
+      const products = [P(1), P(2)];
+      const action = updateFavouriteProducts({ products });
+      expect(action.type).toBe('[Favourite] Update Products');
+      expect(action.products).toEqual(products);
+    });
   });
 
-  it('should update state when updateFavouriteProducts is dispatched', () => {
-    const action = updateFavouriteProducts({ products: mockProducts });
-    const newState = favouriteProductsReducer(initialFavouriteProducts, action);
+  describe('Reducer', () => {
+    it('should return the initial state when passed an unknown action', () => {
+      const state = favouriteProductsReducer(undefined as any, { type: '@@init' } as any);
+      expect(state).toEqual(initialFavouriteProducts);
+    });
 
-    expect(newState.favouriteProducts.length).toBe(2);
-    expect(newState.favouriteProducts[0].title).toBe('Laptop');
+    it('should update favouriteProducts on updateFavouriteProducts', () => {
+      const prev: FavouriteProducts = { favouriteProducts: [P(9)] };
+      Object.freeze(prev);
+      const products = [P(1), P(2), P(3)];
+
+      const state = favouriteProductsReducer(prev, updateFavouriteProducts({ products }));
+
+      expect(state).not.toBe(prev);
+      expect(state.favouriteProducts).toEqual(products);
+    });
+
+    it('should allow clearing favourites via updateFavouriteProducts([])', () => {
+      const prev: FavouriteProducts = { favouriteProducts: [P(1), P(2)] };
+      const state = favouriteProductsReducer(prev, updateFavouriteProducts({ products: [] }));
+      expect(state.favouriteProducts).toEqual([]);
+    });
   });
 
-  it('selectFavouritesProductsFeature should return the full feature slice', () => {
-    const fakeState = {
-      favouritesProducts: {
-        favouriteProducts: mockProducts,
-      },
-    } as { favouritesProducts: FavouriteProducts };
+  describe('Selectors', () => {
+    it('selectFavouritesProductsFeature should return the feature slice', () => {
+      const feature: FavouriteProducts = { favouriteProducts: [P(1)] };
+      const result = FavouriteSelectors.selectFavouritesProductsFeature.projector(feature);
+      expect(result).toBe(feature);
+    });
 
-    const feature = selectFavouritesProductsFeature(fakeState);
-    expect(feature.favouriteProducts.length).toBe(2);
-  });
+    it('selectFavouriteProducts should read favouriteProducts array', () => {
+      const feature: FavouriteProducts = { favouriteProducts: [P(1), P(2)] };
+      const result = FavouriteSelectors.selectFavouriteProducts.projector(feature);
+      expect(result).toEqual(feature.favouriteProducts);
+    });
 
-  it('selectFavouriteProducts should return the products array', () => {
-    const fakeState = {
-      favouritesProducts: {
-        favouriteProducts: mockProducts,
-      },
-    } as { favouritesProducts: FavouriteProducts };
-
-    const selected = selectFavouriteProducts(fakeState);
-    expect(selected).toEqual(mockProducts);
-  });
-
-  it('selectFavouriteIds should return only the ids from products', () => {
-    const fakeState = {
-      favouritesProducts: {
-        favouriteProducts: mockProducts,
-      },
-    } as { favouritesProducts: FavouriteProducts };
-
-    const ids = selectFavouriteIds(fakeState);
-    expect(ids).toEqual([1, 2]);
+    it('selectFavouriteIds should map products to id list', () => {
+      const products = [P(5), P(6), P(7)];
+      const ids = FavouriteSelectors.selectFavouriteIds.projector(products);
+      expect(ids).toEqual([5, 6, 7]);
+    });
   });
 });

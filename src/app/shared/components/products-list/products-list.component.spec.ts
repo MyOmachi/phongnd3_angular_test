@@ -1,29 +1,101 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideMockStore } from '@ngrx/store/testing';
+import { ComponentFixture, DeferBlockBehavior, TestBed, waitForAsync } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
+import { ɵDeferBlockState as DeferState } from '@angular/core';
 
-import { ProductsListComponent } from '../products-list/products-list.component';
+import { ProductsListComponent } from './products-list.component';
+import { Product } from '../../../models/product.model';
 
-describe('ProductsListComponent', () => {
-  let component: ProductsListComponent;
+function P(id: number): Product {
+  return {
+    id,
+    title: 'P' + id,
+    description: 'D' + id,
+    price: id * 10,
+    thumbnail:
+      'https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/thumbnail.webp',
+  } as Product;
+}
+
+async function completeAllDefers(fixture: ComponentFixture<any>) {
+  const blocks = await fixture.getDeferBlocks();
+  for (const b of blocks) {
+    await b.render(DeferState.Complete);
+  }
+  fixture.detectChanges();
+  await fixture.whenStable();
+}
+
+describe(ProductsListComponent.name, () => {
   let fixture: ComponentFixture<ProductsListComponent>;
+  let component: ProductsListComponent;
 
-  beforeEach(async () => {
+  beforeEach(waitForAsync(async () => {
     await TestBed.configureTestingModule({
       imports: [ProductsListComponent],
-      providers: [
-        provideMockStore({ initialState: { favouriteProductIds: { favouriteProductIds: [] } } }),
-      ],
+      deferBlockBehavior: DeferBlockBehavior.Manual,
     }).compileComponents();
 
     fixture = TestBed.createComponent(ProductsListComponent);
     component = fixture.componentInstance;
-    // products input is required by the component - set a default value before detection
-    (fixture.componentInstance as any).products = () => [];
-    (fixture.componentInstance as any).favIds = () => [];
-    fixture.detectChanges();
-  });
+  }));
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('renders a card per product', waitForAsync(async () => {
+    fixture.componentRef.setInput('products', [P(1), P(2), P(3)]);
+    fixture.componentRef.setInput('favouriteIds', [2]);
+    fixture.detectChanges();
+    await completeAllDefers(fixture);
+
+    const items = fixture.debugElement.queryAll(By.css('article[role="listitem"]'));
+    expect(items.length).toBe(3);
+
+    const favBtns = fixture.debugElement.queryAll(By.css('button[mat-icon-button]'));
+    expect(favBtns.length).toBe(3);
+    // second is favourited initially
+    expect(favBtns[1].attributes['aria-pressed']).toBe('true');
+    expect(favBtns[0].attributes['aria-pressed']).toBe('false');
+    expect(favBtns[2].attributes['aria-pressed']).toBe('false');
+  }));
+
+  it('toggles favouriteIds when clicking the favourite button', waitForAsync(async () => {
+    fixture.componentRef.setInput('products', [P(1), P(2)]);
+    fixture.componentRef.setInput('favouriteIds', [2]);
+    fixture.detectChanges();
+    await completeAllDefers(fixture);
+
+    let favBtns = fixture.debugElement.queryAll(By.css('button[mat-icon-button]'));
+    // Click toggle on product 1
+    favBtns[0].nativeElement.click();
+    fixture.detectChanges();
+    await completeAllDefers(fixture);
+
+    // favouriteIds is a ModelSignal on the component: expect it to include 1 and 2
+    expect(component.favouriteIds().sort((a, b) => a - b)).toEqual([1, 2]);
+
+    // The first button should now be pressed
+    favBtns = fixture.debugElement.queryAll(By.css('button[mat-icon-button]'));
+    expect(favBtns[0].attributes['aria-pressed']).toBe('true');
+
+    // Toggle again -> remove 1
+    favBtns[0].nativeElement.click();
+    fixture.detectChanges();
+    await completeAllDefers(fixture);
+
+    expect(component.favouriteIds()).toEqual([2]);
+    favBtns = fixture.debugElement.queryAll(By.css('button[mat-icon-button]'));
+    expect(favBtns[0].attributes['aria-pressed']).toBe('false');
+  }));
+
+  it('shows a View button for each product', waitForAsync(async () => {
+    fixture.componentRef.setInput('products', [P(11), P(12)]);
+    fixture.detectChanges();
+    await completeAllDefers(fixture);
+
+    const viewBtns = fixture.debugElement.queryAll(By.css('button[mat-stroked-button]'));
+    expect(viewBtns.length).toBe(2);
+    expect(viewBtns[0].nativeElement.textContent).toMatch(/view/i);
+  }));
 });
