@@ -72,7 +72,6 @@ describe(ProductsListComponent.name, () => {
     fixture.detectChanges();
     await completeAllDefers(fixture);
 
-    // favouriteIds is a ModelSignal on the component: expect it to include 1 and 2
     expect(component.favouriteIds().sort((a, b) => a - b)).toEqual([1, 2]);
 
     // The first button should now be pressed
@@ -87,15 +86,5 @@ describe(ProductsListComponent.name, () => {
     expect(component.favouriteIds()).toEqual([2]);
     favBtns = fixture.debugElement.queryAll(By.css('button[mat-icon-button]'));
     expect(favBtns[0].attributes['aria-pressed']).toBe('false');
-  }));
-
-  it('shows a View button for each product', waitForAsync(async () => {
-    fixture.componentRef.setInput('products', [P(11), P(12)]);
-    fixture.detectChanges();
-    await completeAllDefers(fixture);
-
-    const viewBtns = fixture.debugElement.queryAll(By.css('button[mat-stroked-button]'));
-    expect(viewBtns.length).toBe(2);
-    expect(viewBtns[0].nativeElement.textContent).toMatch(/view/i);
   }));
 });

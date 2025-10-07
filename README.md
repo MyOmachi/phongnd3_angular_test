@@ -1,4 +1,4 @@
-# Angular v20 – Products & Favourites (Project Overview)
+# PhongND3Shop - Angular E-commerce Application
 
 ## 1) Goal
 
