@@ -5,7 +5,7 @@ import { Product, ProductsResponse } from '../models/product.model';
 import { environment } from '../../enviroments/environment';
 
 @Injectable({ providedIn: 'root' })
-export class ProductService {
+export class ProductsService {
   private http = inject(HttpClient);
   private url = `${environment.apiBaseUrl}/products`;
 

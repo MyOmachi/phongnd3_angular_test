@@ -14,7 +14,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { userReducer } from './store/user/user.reducer';
 import { UserEffects } from './store/user/user.effects';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
-import { favouriteProductIdsReducer } from './store/favourite/favourite.reducer';
+import { favouriteProductsReducer } from './store/favourite/favourite.reducer';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -22,7 +22,7 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(withInterceptors([AuthInterceptor])),
-    provideStore({ user: userReducer, favouriteProductIds: favouriteProductIdsReducer }),
+    provideStore({ user: userReducer, favouritesProducts: favouriteProductsReducer }),
     provideEffects([UserEffects]),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
   ],

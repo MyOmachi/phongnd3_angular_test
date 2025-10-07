@@ -1,15 +1,19 @@
 import { createReducer, on } from '@ngrx/store';
-import { updateFavourite } from './favourite.actions';
+import { Product } from '../../models/product.model';
+import { updateFavouriteProducts } from './favourite.actions';
 
-export type FavouriteProductIdsState = {
-  favouriteProductIds: number[];
+export interface FavouriteProducts {
+  favouriteProducts: Product[];
+}
+
+export const initialFavouriteProducts: FavouriteProducts = {
+  favouriteProducts: [],
 };
 
-export const initialFavouriteProductIdsState: FavouriteProductIdsState = {
-  favouriteProductIds: [],
-};
-
-export const favouriteProductIdsReducer = createReducer<FavouriteProductIdsState>(
-  initialFavouriteProductIdsState,
-  on(updateFavourite, (state, { favouriteProductIds }) => ({ ...state, favouriteProductIds }))
+export const favouriteProductsReducer = createReducer(
+  initialFavouriteProducts,
+  on(updateFavouriteProducts, (state, { products }) => ({
+    ...state,
+    favouriteProducts: products ?? [],
+  }))
 );

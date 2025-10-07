@@ -1,4 +1,5 @@
-<app-products-list [products]="items()" [(favIds)]="favIds"></app-products-list>
+<app-products-list [products]="visibleProducts()" [(favouriteIds)]="favouriteIds">
+</app-products-list>
 
 @if (loading() && !done()) {
 <div class="py-6 text-center text-sm text-gray-600">Loading more...</div>

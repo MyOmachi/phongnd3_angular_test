@@ -1,105 +1,137 @@
-import { DeferBlockBehavior, DeferBlockState, TestBed } from '@angular/core/testing';
-import { provideHttpClient } from '@angular/common/http';
-import { provideMockStore, MockStore } from '@ngrx/store/testing';
+import { Component, Directive } from '@angular/core';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { provideMockStore, MockStore } from '@ngrx/store/testing';
 
 import { ProductsComponent } from './products.component';
-import { ProductsListComponent } from '../shared/products-list/products-list.component';
-import { ProductService } from '../../services/products.service';
-import { updateFavourite } from '../../store/favourite/favourite.actions';
 import { Product } from '../../models/product.model';
+import { ProductsService } from '../../services/products.service';
+import { selectFavouriteProducts } from '../../store/favourite/favourite.selectors';
+import { updateFavouriteProducts } from '../../store/favourite/favourite.actions';
 
-const sampleProducts: Product[] = [
-  {
-    id: 1,
-    title: 'Phone',
-    description: 'Nice',
-    price: 100,
-    thumbnail: 'https://cdn.dummyjson.com/product-images/beauty/red-nail-polish/thumbnail.webp',
-  },
-  {
-    id: 2,
-    title: 'Laptop',
-    description: 'Pro',
-    price: 2000,
-    thumbnail: 'https://cdn.dummyjson.com/product-images/beauty/red-nail-polish/thumbnail.webp',
-  },
-];
+import { input, model, output } from '@angular/core';
 
-class ProductServiceStub {
-  getAllProducts() {
-    return of(sampleProducts);
+@Component({
+  selector: 'app-products-list',
+  standalone: true,
+  template: '',
+})
+class ProductsListStubComponent {
+  products = input<Product[]>([]);
+  favouriteIds = model<number[]>([]);
+  viewed = output<number>();
+}
+
+/** Stub for the infinite scroll directive with function-based inputs/outputs. */
+@Directive({
+  selector: '[appInfiniteScroll]',
+  standalone: true,
+})
+class InfiniteScrollStubDirective {
+  disabled = input<boolean>(false);
+  reached = output<void>();
+
+  /** Helper for the test to simulate reaching the sentinel. */
+  trigger() {
+    this.reached.emit();
   }
 }
 
-describe('ProductsComponent (integration)', () => {
+/* ---------- ProductService mock ---------- */
+
+class ProductServiceMock {
+  private database: Product[] = Array.from({ length: 35 }).map((_, i) => ({
+    id: i + 1,
+    title: `P${i + 1}`,
+    price: 100 + i,
+    description: `D${i + 1}`,
+    thumbnail: '',
+  }));
+
+  getProductsPage(limit = 12, skip = 0) {
+    const slice = this.database.slice(skip, skip + limit);
+    return of(slice);
+  }
+}
+
+describe('ProductsComponent (signals + infinite scroll)', () => {
+  let fixture: ComponentFixture<ProductsComponent>;
+  let component: ProductsComponent;
   let store: MockStore;
-  const initialState = {
-    favouriteProductIds: { favouriteProductIds: [] as number[] },
-  };
+
+  const initialFavouriteFromStore: Product[] = [
+    { id: 2, title: 'Init P2', price: 200, description: 'Init', thumbnail: '' },
+    { id: 4, title: 'Init P4', price: 220, description: 'Init', thumbnail: '' },
+  ];
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ProductsComponent, ProductsListComponent],
+      imports: [ProductsComponent], // bring in the real component
       providers: [
-        provideHttpClient(),
-        provideMockStore({ initialState }),
-        { provide: ProductService, useClass: ProductServiceStub },
+        { provide: ProductsService, useClass: ProductServiceMock },
+        provideMockStore({
+          initialState: {
+            favouritesProducts: { favouriteProducts: initialFavouriteFromStore },
+          },
+        }),
       ],
-      deferBlockBehavior: DeferBlockBehavior.Manual,
-    }).compileComponents();
+    })
+      // Replace real child imports with our stubs (so we can use InputSignal/OutputSignal)
+      .overrideComponent(ProductsComponent, {
+        remove: {
+          // Remove the real imports that the standalone component declares
+          imports: (ProductsComponent as any).ɵcmp.imports,
+        },
+        add: {
+          // Add our stubs instead
+          imports: [ProductsListStubComponent, InfiniteScrollStubDirective],
+        },
+      })
+      .compileComponents();
 
-    store = TestBed.inject(MockStore);
+    store = TestBed.inject(Store) as MockStore;
+    store.overrideSelector(selectFavouriteProducts, initialFavouriteFromStore);
+
+    fixture = TestBed.createComponent(ProductsComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges(); // ngOnInit -> loads first page (12)
   });
 
-  it('renders products from ProductService via ProductsListComponent', async () => {
-    const fixture = TestBed.createComponent(ProductsComponent);
-    fixture.detectChanges();
-
-    const [deferBlock] = await fixture.getDeferBlocks();
-    await deferBlock.render(DeferBlockState.Complete);
-
-    const el: HTMLElement = fixture.nativeElement;
-    const titles = Array.from(el.querySelectorAll('span')).map((s) => s.textContent?.trim());
-
-    expect(titles).toContain('Phone');
-    expect(titles).toContain('Laptop');
+  it('loads the first page (12) on init and syncs favouriteIds from store', () => {
+    expect(component.visibleProducts().length).toBe(12);
+    expect(component['lastStoredFavouriteIds']).toEqual([2, 4]);
+    expect(component.favouriteIds()).toEqual([2, 4]);
   });
 
-  it('toggles favourite in child and dispatches updateFavourite on destroy when changed', async () => {
-    const fixture = TestBed.createComponent(ProductsComponent);
+  it('loadMore appends the next 12 (total 24), then the last page sets done (total 35)', () => {
+    component.loadMore(); // page 2
+    expect(component.visibleProducts().length).toBe(24);
+    expect(component.done()).toBeFalse();
 
-    const dispatchSpy = spyOn(store, 'dispatch').and.callThrough();
+    component.loadMore(); // page 3 -> only 11 remain (35 total)
+    expect(component.visibleProducts().length).toBe(35);
+    expect(component.done()).toBeTrue();
+  });
+
+  it('emitting (reached) from the infinite scroll directive triggers loadMore()', () => {
+    // First page is already loaded (12). Trigger sentinel to load next page.
+    const dirEl = fixture.debugElement.query(By.directive(InfiniteScrollStubDirective));
+    const sentinel = dirEl.injector.get(InfiniteScrollStubDirective);
+    sentinel.trigger();
 
     fixture.detectChanges();
-    const [deferBlock] = await fixture.getDeferBlocks();
-    await deferBlock.render(DeferBlockState.Complete);
+    expect(component.visibleProducts().length).toBe(24);
+  });
 
-    const button: HTMLButtonElement | null =
-      fixture.nativeElement.querySelector('button[mat-icon-button]');
-    expect(button).withContext('Favourite button should exist').not.toBeNull();
+  it('does not dispatch on destroy when favourites are unchanged', () => {
+    const dispatchSpy = spyOn(store, 'dispatch');
 
-    button!.click();
-    fixture.detectChanges();
+    // Keep favourites the same as initial ([2, 4])
+    component.favouriteIds.set([2, 4]);
+
     fixture.destroy();
-
-    expect(dispatchSpy).toHaveBeenCalledTimes(1);
-    const actionArg = dispatchSpy.calls.mostRecent().args[0] as unknown as ReturnType<
-      typeof updateFavourite
-    >;
-    expect(actionArg.type).toBe('[Favourite] Update');
-    expect((actionArg as any).favouriteProductIds).toEqual([1]);
-  });
-
-  it('does NOT dispatch on destroy when favIds unchanged', () => {
-    store.setState({ favouriteProductIds: { favouriteProductIds: [2] } });
-
-    const fixture = TestBed.createComponent(ProductsComponent);
-    const dispatchSpy = spyOn(store, 'dispatch').and.callThrough();
-
-    fixture.detectChanges();
-    fixture.destroy();
-
     expect(dispatchSpy).not.toHaveBeenCalled();
   });
 });

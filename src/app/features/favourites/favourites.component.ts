@@ -1,14 +1,12 @@
-// favourites.component.ts
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Store } from '@ngrx/store';
 import { Product } from '../../models/product.model';
-import { ProductService } from '../../services/products.service';
-import { selectFavouriteProductIds } from '../../store/favourite/favourite.selectors';
-import { updateFavourite } from '../../store/favourite/favourite.actions';
 import { ProductsListComponent } from '../../shared/components/products-list/products-list.component';
+import { selectFavouriteProducts } from '../../store/favourite/favourite.selectors';
+import { updateFavouriteProducts } from '../../store/favourite/favourite.actions';
 import { InfiniteScrollDirective } from '../../shared/directives/infinite-scroll/infinite-scroll.directive';
 
 @Component({
@@ -27,72 +25,59 @@ import { InfiniteScrollDirective } from '../../shared/directives/infinite-scroll
 })
 export class FavouritesComponent {
   private store = inject(Store);
-  private productService = inject(ProductService);
-
   private pageSize = 12;
-  favIds = signal<number[]>([]);
-  private lastStoredFavIds: number[] = [];
-  private allProducts = signal<Product[] | null>(null);
-  items = signal<Product[]>([]);
-  loading = signal<boolean>(true);
-  done = signal<boolean>(false);
+
+  favouriteIds = signal<number[]>([]);
+  private lastStoredFavouriteIds: number[] = [];
+
+  sourceProducts = signal<Product[]>([]);
+  visibleProducts = signal<Product[]>([]);
+  loading = signal(false);
+  done = signal(false);
 
   constructor() {}
 
   ngOnInit() {
-    this.store.select(selectFavouriteProductIds).subscribe((ids) => {
-      this.lastStoredFavIds = ids ? [...ids] : [];
-      this.favIds.set(ids ? [...ids] : []);
-      this.maybeResetAndPrime();
+    this.store.select(selectFavouriteProducts).subscribe((list) => {
+      const all = list ?? [];
+      this.sourceProducts.set(all);
+      this.visibleProducts.set([]);
+      this.done.set(false);
+      this.loading.set(false);
+
+      this.lastStoredFavouriteIds = all.map((p) => p.id);
+      this.favouriteIds.set(this.lastStoredFavouriteIds.slice());
+
+      if (all.length === 0) {
+        this.done.set(true);
+        return;
+      }
+      this.loadMore();
     });
-
-    this.productService.getAllProducts().subscribe({
-      next: (list) => {
-        this.allProducts.set(list ?? []);
-        this.maybeResetAndPrime();
-      },
-      error: () => {
-        this.allProducts.set([]);
-        this.maybeResetAndPrime();
-      },
-    });
-  }
-
-  private maybeResetAndPrime() {
-    if (this.allProducts() === null) return;
-    this.items.set([]);
-    this.done.set(false);
-    this.loading.set(false);
-    if (this.filteredAll().length === 0) {
-      this.done.set(true);
-      return;
-    }
-    this.loadMore();
-  }
-
-  private filteredAll(): Product[] {
-    const all = this.allProducts();
-    const ids = this.favIds();
-    if (!all || ids.length === 0) return [];
-    const set = new Set(ids);
-    return all.filter((p) => set.has(p.id));
   }
 
   loadMore() {
     if (this.loading() || this.done()) return;
     this.loading.set(true);
-    const all = this.filteredAll();
-    const curr = this.items().length;
-    const next = all.slice(curr, curr + this.pageSize);
-    this.items.update((prev) => [...prev, ...next]);
-    if (curr + next.length >= all.length) this.done.set(true);
+
+    const all = this.sourceProducts();
+    const current = this.visibleProducts().length;
+    const next = all.slice(current, current + this.pageSize);
+
+    this.visibleProducts.update((prev) => [...prev, ...next]);
+    if (current + next.length >= all.length) this.done.set(true);
+
     this.loading.set(false);
   }
 
   ngOnDestroy() {
-    const a = this.favIds(),
-      b = this.lastStoredFavIds ?? [];
-    const same = a.length === b.length && a.every((v, i) => v === b[i]);
-    if (!same) this.store.dispatch(updateFavourite({ favouriteProductIds: a }));
+    const ids = this.favouriteIds();
+    const prev = this.lastStoredFavouriteIds ?? [];
+    const same = ids.length === prev.length && ids.every((v, i) => v === prev[i]);
+    if (!same) {
+      const idSet = new Set(ids);
+      const updated = this.sourceProducts().filter((p) => idSet.has(p.id));
+      this.store.dispatch(updateFavouriteProducts({ products: updated }));
+    }
   }
 }

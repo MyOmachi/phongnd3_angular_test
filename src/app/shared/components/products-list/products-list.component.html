@@ -20,11 +20,11 @@
         mat-icon-button
         class="absolute top-2 right-2 bg-white/90 rounded-full"
         (click)="toggleFavourite(p.id)"
-        [attr.aria-pressed]="isFav(p.id)"
-        [attr.aria-label]="isFav(p.id) ? 'Remove from favourites' : 'Add to favourites'"
+        [attr.aria-pressed]="isFavourite(p.id)"
+        [attr.aria-label]="isFavourite(p.id) ? 'Remove from favourites' : 'Add to favourites'"
       >
-        <mat-icon [class.text-red-600]="isFav(p.id)">
-          {{ isFav(p.id) ? 'favorite' : 'favorite_border' }}
+        <mat-icon [class.text-red-600]="isFavourite(p.id)">
+          {{ isFavourite(p.id) ? 'favorite' : 'favorite_border' }}
         </mat-icon>
       </button>
     </div>

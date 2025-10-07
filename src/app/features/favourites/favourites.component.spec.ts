@@ -3,7 +3,7 @@ import { provideMockStore } from '@ngrx/store/testing';
 import { of } from 'rxjs';
 
 import { FavouritesComponent } from './favourites.component';
-import { ProductService } from '../../services/products.service';
+import { ProductsService } from '../../services/products.service';
 
 describe('FavouritesComponent', () => {
   let component: FavouritesComponent;
@@ -16,7 +16,7 @@ describe('FavouritesComponent', () => {
         provideMockStore({
           initialState: { user: {}, favouriteProductIds: { favouriteProductIds: [] } },
         }),
-        { provide: ProductService, useValue: { getAllProducts: () => of([]) } },
+        { provide: ProductsService, useValue: { getAllProducts: () => of([]) } },
       ],
     }).compileComponents();
 

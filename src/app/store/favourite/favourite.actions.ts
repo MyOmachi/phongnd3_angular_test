@@ -1,6 +1,7 @@
 import { createAction, props } from '@ngrx/store';
+import { Product } from '../../models/product.model';
 
-export const updateFavourite = createAction(
-  '[Favourite] Update',
-  props<{ favouriteProductIds: number[] }>()
+export const updateFavouriteProducts = createAction(
+  '[Favourite] Update Products',
+  props<{ products: Product[] }>()
 );

@@ -1,10 +1,14 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { FavouriteProductIdsState } from './favourite.reducer';
+import { FavouriteProducts } from './favourite.reducer';
 
-export const selectFavouriteProductIdsState =
-  createFeatureSelector<FavouriteProductIdsState>('favouriteProductIds');
+export const selectFavouritesProductsFeature =
+  createFeatureSelector<FavouriteProducts>('favouritesProducts');
 
-export const selectFavouriteProductIds = createSelector(
-  selectFavouriteProductIdsState,
-  (state) => state.favouriteProductIds
+export const selectFavouriteProducts = createSelector(
+  selectFavouritesProductsFeature,
+  (s) => s.favouriteProducts
+);
+
+export const selectFavouriteIds = createSelector(selectFavouriteProducts, (products) =>
+  products.map((p) => p.id)
 );
