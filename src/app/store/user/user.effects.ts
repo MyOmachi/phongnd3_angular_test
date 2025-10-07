@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { catchError, exhaustMap, map, of, switchMap } from 'rxjs';
+import { catchError, exhaustMap, map, of, switchMap, tap } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import * as UserActions from './user.actions';
 import { User } from '../../models/auth/auth.model';
@@ -17,6 +17,7 @@ export class UserEffects {
       ofType(UserActions.login),
       exhaustMap(({ username, password }) =>
         this.authService.login(username, password).pipe(
+          tap((res) => this.authService.setAccessToken(res.accessToken ?? null)),
           map((user: User) => {
             const { id, username, email } = user;
             return UserActions.loginSuccess({ user: { id, username, email } });

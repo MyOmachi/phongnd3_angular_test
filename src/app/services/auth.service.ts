@@ -13,8 +13,7 @@ export class AuthService {
   router = inject(Router);
 
   private baseUrl = `${environment.apiBaseUrl}/auth`;
-
-  private _accessToken: string | null = null;
+  private readonly STORAGE_KEY = 'accessToken';
 
   login(username: string, password: string): Observable<LoginResponse> {
     return this.http
@@ -23,14 +22,15 @@ export class AuthService {
   }
 
   getAccessToken(): string | null {
-    return this._accessToken;
+    return sessionStorage.getItem(this.STORAGE_KEY);
   }
 
   setAccessToken(token: string | null): void {
-    this._accessToken = token;
+    if (token) sessionStorage.setItem(this.STORAGE_KEY, token);
+    else sessionStorage.removeItem(this.STORAGE_KEY);
   }
 
   clearAccessToken(): void {
-    this._accessToken = null;
+    sessionStorage.removeItem(this.STORAGE_KEY);
   }
 }
