@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'https://dummyjson.com/',
+  apiBaseUrl: 'https://dummyjson.com',
   enableDebugTools: false,
 };
