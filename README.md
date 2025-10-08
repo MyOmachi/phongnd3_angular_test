@@ -42,8 +42,8 @@ It demonstrates authentication, product browsing with infinite scroll, favourite
 - When clicked:
   - Opens the **Network tab** in Developer Tools → You’ll see a `GET /auth/me` request.
   - **Expected results:**
-    - ✅ 200 OK → Token valid; user data returned.
-    - ❌ 401 Unauthorized → Token expired or invalid.
+    - 200 OK → Token valid; user data returned.
+    - 401 Unauthorized → Token expired or invalid.
 - This helps verify token hydration and automatic redirect behaviour.
 - The DummyJSON API accepts only **integer** values for `expiresInMins`; `1` minute is the minimum.
 
@@ -54,7 +54,7 @@ It demonstrates authentication, product browsing with infinite scroll, favourite
 - Added **Logout button** in the toolbar.
 - Redirects back to `/login`.
 
-### ♾️ Infinite Scroll
+### Infinite Scroll
 
 - Implemented using a custom directive `appInfiniteScroll`.
 - Detects when the bottom element intersects the viewport to trigger loading the next page.
@@ -86,6 +86,8 @@ npm start
 ```
 
 Then open [http://localhost:4200](http://localhost:4200)
+
+Login with account emilys / emilyspass
 
 ---
 
@@ -122,30 +124,23 @@ Then open [http://localhost:4200](http://localhost:4200)
 
 ## 6. The Trickiest Part & the Fix
 
-The most challenging part of the project was **combining Angular’s `@defer` rendering mechanism with the infinite scroll feature**.
+The most challenging part was combining Angular’s @defer rendering with the infinite scroll directive.
+@defer delays DOM creation, while the scroll directive relies on a visible element for its IntersectionObserver. When both ran together, the observer sometimes triggered too early or not at all because the deferred content wasn’t rendered yet.
 
-By design, `@defer` postpones rendering certain template sections until specific conditions are met (like entering the viewport or user interaction).
-However, the **Infinite Scroll Directive** depends on the **DOM being fully available** so that its `IntersectionObserver` can track the bottom element correctly.
+- The Fix
 
-When both were active:
+Used a single scroll mechanism — kept only the appInfiniteScroll directive for clarity and predictable behavior.
 
-- The deferred product list template wasn’t rendered yet when the observer initialized.
-- The observer would either trigger prematurely or fail entirely because the target element didn’t exist in the DOM.
-- This caused inconsistent loading behaviour and race conditions between rendering and data fetching.
+Completed deferred views manually before initializing the observer, ensuring the target element exists in the DOM.
 
-### 🧠 The Solution
+Separated rendering and data loading, letting @defer handle visuals while signals and services manage data flow.
 
-To solve this cleanly and keep the application stable and testable:
+Used Angular signals to sync DOM readiness with scroll state efficiently.
 
-1. **Chose a single scroll mechanism** — kept only the `appInfiniteScroll` directive, removing all extra scroll logic from deferred templates.
-   → This ensured a single, predictable trigger for loading more items.
-2. **Manually completed deferred views** whenever they were needed for activation logic (e.g., first render of product list).
-   → That means the component explicitly waits for deferred rendering to complete before setting up observers.
-3. **Refactored product loading flow** so that rendering (`@defer`) and data fetching (HTTP + signals) no longer depend on each other — the directive only reacts once the DOM is ready.
-4. **Used Angular signals** to synchronize state updates between rendered elements and observer callbacks without triggering extra change detection cycles.
+- Result
 
-### ✅ Result
+Smooth, consistent infinite scroll behavior.
 
-- The UI feels faster because `@defer` still defers heavy DOM sections.
-- Infinite scroll triggers consistently and never double-fires.
-- The code stays simple: one directive, one observable chain, predictable behaviour.
+No double triggers or missed loads.
+
+Cleaner, more maintainable code with clear render–fetch separation.
