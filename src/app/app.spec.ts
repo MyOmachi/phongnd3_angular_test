@@ -26,7 +26,6 @@ describe('App', () => {
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    // the app template contains the app title in the toolbar
     expect(compiled.querySelector('.font-semibold')?.textContent).toContain('DummyShop');
   });
 });

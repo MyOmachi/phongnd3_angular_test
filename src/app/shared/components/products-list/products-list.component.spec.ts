@@ -67,14 +67,12 @@ describe(ProductsListComponent.name, () => {
     await completeAllDefers(fixture);
 
     let favBtns = fixture.debugElement.queryAll(By.css('button[mat-icon-button]'));
-    // Click toggle on product 1
     favBtns[0].nativeElement.click();
     fixture.detectChanges();
     await completeAllDefers(fixture);
 
     expect(component.favouriteIds().sort((a, b) => a - b)).toEqual([1, 2]);
 
-    // The first button should now be pressed
     favBtns = fixture.debugElement.queryAll(By.css('button[mat-icon-button]'));
     expect(favBtns[0].attributes['aria-pressed']).toBe('true');
 

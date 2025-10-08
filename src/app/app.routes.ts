@@ -1,4 +1,4 @@
-import { CanMatchFn, Routes } from '@angular/router';
+import { Routes } from '@angular/router';
 import { authGuard } from './guards/auth.guard';
 import { unknownRedirectGuard } from './guards/unknown-redirect.guard';
 import { NotFoundRedirectComponent } from './features/not-found-redirect/not-found-redirect.component';
