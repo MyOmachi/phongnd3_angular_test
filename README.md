@@ -45,7 +45,10 @@ I created small app that demonstrates an **infinite-scroll product list**, simpl
    - Call **`/auth/refresh`** with the stored refresh token.
    - Save the new tokens.
    - **Retry** the original `/auth/me` call → should now succeed (200).
+<img width="1909" height="951" alt="image" src="https://github.com/user-attachments/assets/76a2bcf1-4a64-429a-b352-a2e17332297a" />
+
 
 > Notes:
 >
 > - This button doesn’t change app data; it simply “pings” a protected endpoint to exercise the **401 → refresh → retry** flow.
+>
