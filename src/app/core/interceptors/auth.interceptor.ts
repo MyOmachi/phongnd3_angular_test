@@ -47,7 +47,6 @@ export class AuthInterceptor implements HttpInterceptor {
     }
 
     const rt = this.auth.getRefreshToken?.() ?? null;
-    console.log('Refresh token:', rt);
     if (!rt) {
       this.forceLogout();
       return throwError(() => new Error('No refresh token'));
