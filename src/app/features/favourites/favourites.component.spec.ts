@@ -3,10 +3,10 @@ import { ɵDeferBlockState as DeferState } from '@angular/core';
 import { provideMockStore, MockStore } from '@ngrx/store/testing';
 
 import { FavouritesComponent } from './favourites.component';
-import { Product } from '../../models/product.model';
 
 import * as FavouriteSelectors from '../../store/favourite/favourite.selectors';
 import * as FavouriteActions from '../../store/favourite/favourite.actions';
+import { Product } from '../../core/models/product.model';
 
 function P(id: number): Product {
   return {

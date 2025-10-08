@@ -4,11 +4,11 @@ import { ɵDeferBlockState as DeferState } from '@angular/core';
 import { of, Subject } from 'rxjs';
 
 import { ProductsComponent } from './products.component';
-import { ProductsService } from '../../services/products.service';
-import { Product } from '../../models/product.model';
 
 import * as FavouriteSelectors from '../../store/favourite/favourite.selectors';
 import * as FavouriteActions from '../../store/favourite/favourite.actions';
+import { Product } from '../../core/models/product.model';
+import { ProductsService } from '../../core/services/products.service';
 
 class ProductsServiceMock {
   getProductsPage = jasmine.createSpy('getProductsPage');

@@ -12,12 +12,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { Store } from '@ngrx/store';
 import { Subject, takeUntil } from 'rxjs';
 
-import { Product } from '../../models/product.model';
-import { ProductsService } from '../../services/products.service';
 import { selectFavouriteProducts } from '../../store/favourite/favourite.selectors';
 import { updateFavouriteProducts } from '../../store/favourite/favourite.actions';
 import { ProductsListComponent } from '../../shared/components/products-list/products-list.component';
 import { InfiniteScrollDirective } from '../../shared/directives/infinite-scroll/infinite-scroll.directive';
+import { Product } from '../../core/models/product.model';
+import { ProductsService } from '../../core/services/products.service';
 
 @Component({
   standalone: true,

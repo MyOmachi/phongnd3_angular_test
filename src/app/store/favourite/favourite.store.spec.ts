@@ -1,3 +1,4 @@
+import { Product } from '../../core/models/product.model';
 import { updateFavouriteProducts } from './favourite.actions';
 import {
   favouriteProductsReducer,
@@ -5,7 +6,6 @@ import {
   FavouriteProducts,
 } from './favourite.reducer';
 import * as FavouriteSelectors from './favourite.selectors';
-import { Product } from '../../models/product.model';
 
 function P(id: number): Product {
   return {

@@ -12,8 +12,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { Store } from '@ngrx/store';
 import { selectIsLoggedIn } from './store/user/user.selectors';
 import { AsyncPipe, CommonModule } from '@angular/common';
-import { AuthService } from './services/auth.service';
 import * as UserActions from './store/user/user.actions';
+import { AuthService } from './core/services/auth.service';
 
 @Component({
   selector: 'app-root',

@@ -7,8 +7,8 @@ import { login, loginFailure, loginSuccess } from './user.actions';
 import { userReducer, initialUserState, UserState } from './user.reducer';
 import * as UserSelectors from './user.selectors';
 import { UserEffects } from './user.effects';
-import { AuthService } from '../../services/auth.service';
-import { User } from '../../models/auth/auth.model';
+import { AuthService } from '../../core/services/auth.service';
+import { User } from '../../core/models/auth/auth.model';
 
 function U(id: number): User {
   return { id, username: 'user' + id, email: 'u' + id + '@mail.com' } as User;

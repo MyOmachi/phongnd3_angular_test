@@ -3,7 +3,7 @@ import { By } from '@angular/platform-browser';
 import { ɵDeferBlockState as DeferState } from '@angular/core';
 
 import { ProductsListComponent } from './products-list.component';
-import { Product } from '../../../models/product.model';
+import { Product } from '../../../core/models/product.model';
 
 function P(id: number): Product {
   return {

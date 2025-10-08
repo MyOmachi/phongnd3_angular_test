@@ -3,11 +3,11 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { Store } from '@ngrx/store';
-import { Product } from '../../models/product.model';
 import { ProductsListComponent } from '../../shared/components/products-list/products-list.component';
 import { selectFavouriteProducts } from '../../store/favourite/favourite.selectors';
 import { updateFavouriteProducts } from '../../store/favourite/favourite.actions';
 import { InfiniteScrollDirective } from '../../shared/directives/infinite-scroll/infinite-scroll.directive';
+import { Product } from '../../core/models/product.model';
 
 @Component({
   selector: 'app-favourites.component',
